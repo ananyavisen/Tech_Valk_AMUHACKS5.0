@@ -23,7 +23,8 @@ This project aims to create a personalized survival guide for first-semester stu
 - User authentication done
 - New account creation done
 - Saving questionnaires data in DB done
-- working on resource and quest recommendation
+- Working on resource and quest recommendation
+- Course based resource allotment done
 
 ## Hackathon
 AMUHACKS 5.0  
