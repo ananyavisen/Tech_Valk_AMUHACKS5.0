@@ -87,8 +87,37 @@
         .dashboard-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
+            grid-template-areas:
+                "confidence mentor"
+                "quest resources"
+                "reflection logs";
             gap: 30px;
         }
+
+        .area-confidence {
+            grid-area: confidence;
+        }
+
+        .area-mentor {
+            grid-area: mentor;
+        }
+
+        .area-quest {
+            grid-area: quest;
+        }
+
+        .area-resources {
+            grid-area: resources;
+        }
+
+        .area-reflection {
+            grid-area: reflection;
+        }
+
+        .area-logs {
+            grid-area: logs;
+        }
+
 
         .card {
             background: linear-gradient(145deg, rgba(42, 24, 16, 0.95), rgba(26, 15, 8, 0.95));
@@ -515,6 +544,11 @@
             }
         }
 
+        .resource-item {
+            cursor: pointer;
+        }
+
+
         .save-entry-btn {
             width: 100%;
             background: rgba(139, 105, 20, 0.3);
@@ -706,16 +740,27 @@
             z-index: 999;
         }
 
+        .mood-btn.active {
+            background: rgba(218, 165, 32, .25);
+            border-color: #daa520;
+        }
+
+        .mood-btn.active {
+            background: rgba(218, 165, 32, .25);
+            border-color: #daa520;
+            transform: translateY(-2px);
+        }
+
+
         .settings-menu.active {
             display: flex;
         }
 
-        .settings-item, a{
-            padding: 14px;
+        .settings-item {
+            padding: 14px 16px;
             color: #f4e4c1;
             cursor: pointer;
             transition: .25s;
-            text-decoration: none;
         }
 
         .settings-item:hover {
@@ -803,9 +848,10 @@
         .mood-btn span {
             display: none;
         }
-body.fade-out{
-    opacity:0;
-}
+
+        body.fade-out {
+            opacity: 0;
+        }
 
         .mood-btn:hover {
             background: rgba(218, 165, 32, 0.2);
@@ -859,6 +905,52 @@ body.fade-out{
             user-select: none;
             pointer-events: none;
         }
+
+        /* ⭐ PREMIUM DAILY LOGS */
+
+        .log-item {
+            background: rgba(15, 10, 5, .5);
+            border: 1px solid rgba(139, 105, 20, .3);
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: .35s ease;
+            overflow: hidden;
+        }
+
+        .log-item:hover {
+            border-color: #daa520;
+            box-shadow: 0 0 15px rgba(218, 165, 32, .35);
+            transform: translateY(-2px);
+        }
+
+        /* hidden expandable text */
+        .log-full {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: all .45s ease;
+            color: #d4c4a8;
+            margin-top: 8px;
+        }
+
+        .log-item.active .log-full {
+            max-height: 200px;
+            opacity: 1;
+        }
+
+        /* slide-in animation */
+        @keyframes slideInLog {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 
@@ -880,8 +972,8 @@ body.fade-out{
             <span class="settings-btn" onclick="toggleSettings()">⚙️</span>
 
             <div class="settings-menu" id="settingsMenu">
-                <div class="settings-item"><a href="{% url 'login' %}">🚪Log out </a></div>
-                <div class="settings-item"><a href="#"> 🔐 Change Password </a></div>
+                <div class="settings-item" onclick="logoutUser()">🚪 Log out</div>
+                <div class="settings-item" onclick="changePassword()">🔐 Change Password</div>
             </div>
         </div>
 
@@ -890,146 +982,157 @@ body.fade-out{
     <div class="main-content">
         <div class="dashboard-grid">
             <!-- Left Column -->
-            <div>
-                <!-- Confidence Fuel -->
-                <div class="card">
-                    <div class="card-header">
 
-                        <div class="card-title">
-                            <h3>Confidence Fuel</h3>
-                            <p>Your progress indicator</p>
-                        </div>
-                    </div>
-                    <div class="progress-container">
-                        <div class="progress-header">
-                           <div class="progress-percentage">
-                                {{ fuel_percentage|default:20 }}%
-                            </div>
-                            <div class="progress-encourage">{{ encouragement }}</div>
-                        </div>
-                        <div class="progress-bar-wrapper">
-                           <div class="progress-bar-fill" id="fuelBar"></div>
-                        </div>
-                        <div class="progress-markers">
-                            <span class="progress-marker">0</span>
-                            <span class="progress-marker">25</span>
-                            <span class="progress-marker">50</span>
-                            <span class="progress-marker">75</span>
-                            <span class="progress-marker">100</span>
-                        </div>
+            <!-- Confidence Fuel -->
+            <div class="card area-confidence">
+                <div class="card-header">
+
+                    <div class="card-title">
+                        <h3>Confidence Fuel</h3>
+                        <p>Your progress indicator</p>
                     </div>
                 </div>
-
-                <!-- Today's Quest -->
-                <div class="card" style="margin-top: 30px;">
-                    <div class="quest-card-header">
-                        <div class="card-header" style="margin-bottom: 0;">
-                            <div class="card-title">
-                                <h3>Today's Quest</h3>
-                                <p>Your personalized challenge</p>
-                            </div>
-                        </div>
+                <div class="progress-container">
+                    <div class="progress-header">
+                        <div class="progress-percentage">42.5%</div>
+                        <div class="progress-encourage">🏹 Keep going!</div>
                     </div>
-
-                  <div class="quest-content">
-
-                    {% if quest %}
-                    <h2>{{ quest.title }}</h2>
-                    <p>{{ quest.description }}</p>
-                {% else %}
-                    <h2>Stay Consistent</h2>
-                    <p>Complete your reflection to unlock a quest.</p>
-                {% endif %}
-
-    <div class="challenge-box">
-        <h4>🪙 The Challenge:</h4>
-        <p>{{ quest.description }}</p>
-    </div>
-    <form method="POST" action="{% url 'complete_quest' %}">
-        {% csrf_token %}
-    <button type="submit" class="complete-btn">
-        <span>✓</span>
-        Mark as Complete
-    </button>
-   </form>
-    <form method="POST" action="{% url 'skip_quest' %}">
-    {% csrf_token %}
-    <button type="submit" class="skip-link" style="background:none;border:none;color:#daa520;cursor:pointer;">
-        ↻ Skip Quest
-    </button>
-</form>
-
-
-</div>
- 
-                </div>
-
-                <!-- Bottom Section -->
-                <div class="bottom-section">
-                    <form method="POST" action="{% url 'save_daily_log' %}">
-                    {% csrf_token %}
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-icon">🪔</div>
-                            <div class="card-title">
-                                <h3>Daily Reflection</h3>
-                                <p>Select moods and journal your thoughts</p>
-                            </div>
-                        </div>
-
-
-                        <!-- Mood Emoji Selector -->
-                        <div class="mood-toolbar" id="moodToolbar">
-                            <div class="mood-btn" onclick="insertMood(this)">😜<span>Playful Energy</span></div>
-                            <div class="mood-btn" onclick="insertMood(this)">😁<span>Joyful Mood</span></div>
-                            <div class="mood-btn" onclick="insertMood(this)">😎<span>Confident Aura</span></div>
-                            <div class="mood-btn" onclick="insertMood(this)">😵<span>Overwhelmed State</span></div>
-                            <div class="mood-btn" onclick="insertMood(this)">🤝<span>Supportive Presence</span></div>
-                            <div class="mood-btn" onclick="insertMood(this)">🌙<span>Quiet Reserve</span></div>
-                            <div class="mood-btn" onclick="insertMood(this)">🌀<span>Tense Atmosphere</span></div>
-                            <div class="mood-btn" onclick="insertMood(this)">🔍<span>Curious Mind</span></div>
-                            <div class="mood-btn" onclick="insertMood(this)">🏆<span>Competitive Drive</span></div>
-                            <div class="mood-btn" onclick="insertMood(this)">📝<span>Focused Study</span></div>
-                            <div class="mood-btn" onclick="insertMood(this)">💡<span>Creative Spark</span></div>
-                            <div class="mood-btn" onclick="insertMood(this)">🙏<span>Grateful Heart</span></div>
-
-                        </div>
-
-                        <div class="moods-container" id="moodsContainer"></div>
-                         <input type="hidden" name="selected_moods" id="selectedMoods">
-
-                        <!-- Reflection Textarea -->
-                        <textarea class="reflection-textarea" id="reflectionBox" name="reflection" maxlength="300"
-                            placeholder="Write about your day... Click emojis above to insert moods into your journal."
-                            oninput="updateCharCount(this)"></textarea>
-
-                        <button type="submit"
-                        class="save-entry-btn">
-                            <span>💾</span>
-                            Save Daily Entry
-                        </button>
-
-                        <div class="character-count">0 characters</div>
+                    <div class="progress-bar-wrapper">
+                        <div class="progress-bar-fill" style="width: 42.5%;"></div>
                     </div>
-                  </form>
+                    <div class="progress-markers">
+                        <span class="progress-marker">0</span>
+                        <span class="progress-marker">25</span>
+                        <span class="progress-marker">50</span>
+                        <span class="progress-marker">75</span>
+                        <span class="progress-marker">100</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Right Column -->
-            <div>
-                <!-- Talk to Mentor -->
-                <div class="card mentor-card">
-                    <div class="card-icon" style="background: rgba(26, 15, 8, 0.4); margin-bottom: 15px;">💬</div>
-                    <h3>Talk to Mentor </h3>
-                    <p>Get personalized guidance and support from your AI mentor</p>
-                    <a class="mentor-link" onclick="openMentorModal()">
-                        Click to chat
-                        <span>→</span>
-                    </a>
+            <!-- Today's Quest -->
+            <div class="card area-quest" style="margin-top: 30px;">
+                <div class="quest-card-header">
+                    <div class="card-header" style="margin-bottom: 0;">
+                        <div class="card-title">
+                            <h3>Today's Quest</h3>
+                            <p>Your personalized challenge</p>
+                        </div>
+                    </div>
+                    <div class="social-badge">
+                        <span>🦜</span>
+                        <span>Social</span>
+                    </div>
                 </div>
 
-                <!-- Resources -->
-                <div class="card area-resources" style="margin-top: 20px;">
+                <div class="quest-content">
+                    <h2>Give a Genuine Compliment</h2>
+                    <p>Compliment someone on their work or personality</p>
+
+                    <div class="challenge-box">
+                        <h4>🪙 The Challenge:</h4>
+                        <p>Make someone's day by acknowledging their strengths</p>
+                    </div>
+
+                    <button class="complete-btn">
+                        <span>✓</span>
+                        Mark as Complete
+                    </button>
+
+                    <div class="quest-footer">
+                        <div class="quest-tip">
+                            💡 Tip: Complete quests to build your confidence fuel
+                        </div>
+                        <a class="skip-link">
+                            <span>↻</span>
+                            Skip Quest
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Section -->
+
+
+            <!-- ⭐ LEFT CARD — Daily Reflection -->
+
+            <div class="card area-reflection">
+                <div class="card-header">
+                    <div class="card-icon">🪔</div>
+                    <div class="card-title">
+                        <h3>Daily Reflection</h3>
+                        <p>Select moods and journal your thoughts</p>
+                    </div>
+
+                </div>
+
+
+
+                <!-- Mood Emoji Selector -->
+                <div class="mood-toolbar" id="moodToolbar">
+                    <div class="mood-btn" onclick="insertMood(this)">😜<span>Playful Energy</span></div>
+                    <div class="mood-btn" onclick="insertMood(this)">😁<span>Joyful Mood</span></div>
+                    <div class="mood-btn" onclick="insertMood(this)">😎<span>Confident Aura</span></div>
+                    <div class="mood-btn" onclick="insertMood(this)">😵<span>Overwhelmed State</span></div>
+                    <div class="mood-btn" onclick="insertMood(this)">🤝<span>Supportive Presence</span></div>
+                    <div class="mood-btn" onclick="insertMood(this)">🌙<span>Quiet Reserve</span></div>
+                    <div class="mood-btn" onclick="insertMood(this)">🌀<span>Tense Atmosphere</span></div>
+                    <div class="mood-btn" onclick="insertMood(this)">🔍<span>Curious Mind</span></div>
+                    <div class="mood-btn" onclick="insertMood(this)">🏆<span>Competitive Drive</span></div>
+                    <div class="mood-btn" onclick="insertMood(this)">📝<span>Focused Study</span></div>
+                    <div class="mood-btn" onclick="insertMood(this)">💡<span>Creative Spark</span></div>
+                    <div class="mood-btn" onclick="insertMood(this)">🙏<span>Grateful Heart</span></div>
+
+                </div>
+
+                <div class="moods-container" id="moodsContainer"></div>
+
+                <!-- Reflection Textarea -->
+                <textarea class="reflection-textarea" id="reflectionBox"
+                    placeholder="Write about your day... Click emojis above to insert moods into your journal."
+                    oninput="updateCharCount(this)"></textarea>
+
+                <button class="save-entry-btn">
+                    <span>💾</span>
+                    Save Daily Entry
+                </button>
+
+                <div class="character-count">0 characters</div>
+            </div>
+
+            <div class="card area-logs">
+                <div class="card-header">
+                    <div class="card-icon">📜</div>
+                    <div class="card-title">
+                        <h3>Daily Logs</h3>
+                        <p>Your past reflections</p>
+                    </div>
+                </div>
+
+                <div id="logsList" style="display:flex;flex-direction:column;gap:10px;"></div>
+
+                <button id="toggleLogsBtn" class="view-all-btn" onclick="toggleLogs()">
+                    View All Logs →
+                </button>
+
+            </div>
+
+
+            <!-- Right Column -->
+
+            <!-- Talk to Mentor -->
+            <div class="card mentor-card area-mentor">
+                <div class="card-icon" style="background: rgba(26, 15, 8, 0.4); margin-bottom: 15px;">💬</div>
+                <h3>Talk to Mentor </h3>
+                <p>Get personalized guidance and support from your AI mentor</p>
+                <a class="mentor-link" onclick="openMentorModal()">
+                    Click to chat
+                    <span>→</span>
+                </a>
+            </div>
+
+            <!-- Resources -->
+            <div class="card area-resources" style="margin-top: 20px;">
                 <div class="card-header">
                     <div class="card-icon">🗺️</div>
                     <div class="card-title">
@@ -1039,7 +1142,7 @@ body.fade-out{
                 </div>
 
                 <div class="resources-list">
-                    <div class="resource-item"onclick="openResourcesModal('notes')">
+                    <div class="resource-item"onclick="openResourcesModal('notes') >
                         <div class="resource-left">
                             <div class="resource-icon">📄</div>
                             <div class="resource-info">
@@ -1054,7 +1157,7 @@ body.fade-out{
                             <div class="resource-icon">🎥</div>
                             <div class="resource-info">
                                 <h4>Video Lectures</h4>
-                            </div>
+                                <p>8 items</p>
                             </div>
                             <span style="color: #daa520;">→</span>
                         </div>
@@ -1065,54 +1168,19 @@ body.fade-out{
                             <div class="resource-icon">⬇</div>
                             <div class="resource-info">
                                 <h4>Articles</h4>
-                                
+                                <p>5 items</p>
                             </div>
                         </div>
                         <span style="color: #daa520;">→</span>
                     </div>
                 </div>
 
-       
-
-
-                <!-- Daily Logs -->
-<div class="card" style="margin-top: 20px;">
-    <div class="card-header">
-        <div class="card-icon">📜</div>
-        <div class="card-title">
-            <h3>Daily Logs</h3>
-            <p>Your past reflections</p>
-        </div>
-    </div>
-
-    <div style="display:flex;flex-direction:column;gap:10px;max-height:300px;overflow-y:auto;">
-
-        {% for log in recent_logs %}
-        <div class="mood-display-box" style="cursor:pointer;"
-             onclick="this.nextElementSibling.classList.toggle('active')">
-
-            {{ log.moods }}
-
-        </div>
-
-        <div class="log-full" style="margin-bottom:15px;">
-            <div style="color:#daa520;font-size:12px;margin-bottom:6px;">
-                {{ log.created_at|date:"M d, Y - H:i" }}
+                <button class="view-all-btn">
+                    View All
+                    <span>→</span>
+                </button>
             </div>
 
-            <div style="color:#d4c4a8;font-size:14px;">
-                {{ log.reflection }}
-            </div>
-        </div>
-
-        {% empty %}
-        <p style="color:#6b5d42;">No reflections yet.</p>
-        {% endfor %}
-
-    </div>
-</div>
-
-            </div>
         </div>
     </div>
 
@@ -1154,7 +1222,7 @@ body.fade-out{
             </div>
         </div>
     </div>
-<!--resource modal-->
+ <!--resource modal-->
     <div class="modal-overlay" id="resourcesModal">
     <div class="modal" style="max-width:800px;">
         <div class="modal-header">
@@ -1174,14 +1242,11 @@ body.fade-out{
         </div>
     </div>
 </div>
-  
 
 
     <script>
         let selectedMoods = [];
-        
-        document.getElementById("fuelBar").style.width =
-            "{{ fuel_percentage|default:20 }}" + "%";
+        let showAllLogs = false;
 
 
         function toggleMood(card) {
@@ -1200,7 +1265,23 @@ body.fade-out{
                 }
             }
         }
-         function openResourcesModal(type) {
+
+        function updateCharCount(textarea) {
+            const count = textarea.value.length;
+            const countElement = textarea.parentElement.querySelector('.character-count');
+            countElement.textContent = `${count} characters`;
+        }
+
+        function openResourcePage(page) {
+
+            /* smooth fade like logout */
+            document.body.classList.add("fade-out");
+
+            setTimeout(() => {
+                window.location.href = page;
+            }, 450);
+        }
+        function openResourcesModal(type) {
 
             document.getElementById("resourcesModal").classList.add("active");
 
@@ -1252,24 +1333,10 @@ body.fade-out{
             }
         }
 
+function closeResourcesModal() {
+    document.getElementById("resourcesModal").classList.remove("active");
+}
 
-    function closeResourcesModal() {
-        document.getElementById("resourcesModal").classList.remove("active");
-    }
-
-    function showTab(tabName) {
-
-        const tabs = document.querySelectorAll(".resource-tab");
-        tabs.forEach(tab => tab.style.display = "none");
-
-        document.getElementById(tabName).style.display = "block";
-    }
-
-        function updateCharCount(textarea) {
-            const count = textarea.value.length;
-            const countElement = textarea.parentElement.querySelector('.character-count');
-            countElement.textContent = `${count} characters`;
-        }
 
         function openMentorModal() {
             document.getElementById('mentorModal').classList.add('active');
@@ -1331,33 +1398,193 @@ body.fade-out{
             }
         });
 
-       function insertMood(el) {
+        /* ⭐ Close Resources Modal on outside click */
+        document.getElementById('resourcesModal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closeResourcesModal();
+            }
+        });
 
-    const emoji = el.childNodes[0].textContent;
-    const text = el.querySelector('span').textContent;
-    const moodsContainer = document.getElementById('moodsContainer');
-    const hiddenInput = document.getElementById('selectedMoods');
 
-    // limit to 3 moods (UI)
-    if (moodsContainer.children.length >= 3) {
-        moodsContainer.removeChild(moodsContainer.firstChild);
-    }
+        function openResourcesModal() {
+            document.getElementById("resourcesModal").classList.add("active");
+        }
 
-    const moodBox = document.createElement('div');
-    moodBox.className = 'mood-display-box';
-    moodBox.innerHTML = `${emoji} ${text}`;
+        function closeResourcesModal() {
+            document.getElementById("resourcesModal").classList.remove("active");
+        }
 
-    moodsContainer.appendChild(moodBox);
+        /* ⭐ Inline tab navigation */
+        function showResource(type) {
 
-    // 🔥 Collect all selected moods from container
-    let moods = [];
-    for (let child of moodsContainer.children) {
-        moods.push(child.textContent.trim());
-    }
+            const content = document.getElementById("resourceContent");
 
-    // Store as comma separated string
-    hiddenInput.value = moods.join(" | ");
-}
+            if (type === "notes") {
+                content.innerHTML = `
+            <h4 style="color:#daa520;">📄 Study Notes</h4>
+            <p>Add your PDFs, notes, or links here.</p>
+        `;
+            }
+
+            if (type === "videos") {
+                content.innerHTML = `
+            <h4 style="color:#daa520;">🎥 Video Lectures</h4>
+            <p>Embed YouTube videos or lecture links here.</p>
+        `;
+            }
+
+            if (type === "articles") {
+                content.innerHTML = `
+            <h4 style="color:#daa520;">⬇ Articles</h4>
+            <p>Add blog posts, reading materials, or downloads.</p>
+        `;
+            }
+        }
+
+
+        function insertMood(el) {
+
+            const emoji = el.childNodes[0].textContent;
+            const text = el.querySelector('span').textContent;
+            const moodId = emoji + " " + text;
+
+            const moodsContainer = document.getElementById('moodsContainer');
+
+            // check if already selected
+            const existing = Array.from(moodsContainer.children)
+                .find(box => box.dataset.id === moodId);
+
+            // ⭐ TOGGLE OFF (remove)
+            if (existing) {
+                existing.remove();
+                el.classList.remove("active");
+                return;
+            }
+
+            // ⭐ LIMIT TO ONLY 3 EMOJIS
+            if (moodsContainer.children.length >= 3) {
+                return; // stop adding more
+            }
+
+            // ⭐ ADD NEW MOOD
+            const moodBox = document.createElement('div');
+            moodBox.className = 'mood-display-box';
+            moodBox.dataset.id = moodId;
+            moodBox.textContent = moodId;
+
+            moodsContainer.appendChild(moodBox);
+
+            // highlight emoji button
+            el.classList.add("active");
+        }
+
+
+
+
+
+        // Save reflection to browser
+        // ⭐ Save MULTIPLE Daily Logs
+        document.querySelector('.save-entry-btn').addEventListener('click', () => {
+
+            const text = document.getElementById('reflectionBox').value.trim();
+            if (!text) return;
+
+            // collect selected moods
+            const moods = Array.from(document.querySelectorAll(".mood-display-box"))
+                .map(m => m.textContent);
+
+            // get existing logs
+            const logs = JSON.parse(localStorage.getItem("dailyLogs") || "[]");
+
+            // add new log at top
+            logs.unshift({
+                text: text,
+                moods: moods,
+                date: new Date().toLocaleString()
+            });
+
+            // save back
+            localStorage.setItem("dailyLogs", JSON.stringify(logs));
+
+            renderLogs();
+
+            /* ⭐ RESET REFLECTION PANEL AFTER SAVE */
+
+            // clear textarea
+            document.getElementById("reflectionBox").value = "";
+            updateCharCount(document.getElementById("reflectionBox"));
+
+            // clear locked mood boxes
+            document.getElementById("moodsContainer").innerHTML = "";
+
+            // remove active state from emojis
+            document.querySelectorAll(".mood-btn.active")
+                .forEach(btn => btn.classList.remove("active"));
+
+            alert("Entry Saved!");
+
+        });
+
+        function renderLogs() {
+
+            const logsList = document.getElementById("logsList");
+            if (!logsList) return;
+
+            logsList.innerHTML = "";
+
+            const logs = JSON.parse(localStorage.getItem("dailyLogs") || "[]");
+            const visibleLogs = showAllLogs ? logs : logs.slice(0, 3);
+
+
+            visibleLogs.forEach((log, index) => {
+
+                const item = document.createElement("div");
+                item.className = "log-item";
+                item.style.animation = "slideInLog .35s ease";
+
+                item.innerHTML = `
+            <div style="color:#daa520;font-size:12px;margin-bottom:6px;">
+                ${log.date}
+            </div>
+
+            <div style="color:#f4e4c1;font-size:14px;display:flex;flex-direction:column;gap:4px;">
+    ${log.moods.map(m => `<div>${m}</div>`).join("")}
+</div>
+
+
+            <div class="log-full">
+                ${log.text}
+            </div>
+        `;
+
+                /* ⭐ CLICK TO EXPAND */
+                item.onclick = () => {
+                    item.classList.toggle("active");
+                }
+
+
+                logsList.appendChild(item);
+            });
+
+            /* ⭐ AUTO SCROLL TO NEWEST */
+            logsList.scrollTop = 0;
+        }
+
+
+
+
+        // Load saved reflection when page opens
+        window.onload = () => {
+
+            renderLogs(); // ⭐ load history panel
+
+            const saved = localStorage.getItem('dailyReflection');
+            if (saved) {
+                document.getElementById('reflectionBox').value = saved;
+                updateCharCount(document.getElementById('reflectionBox'));
+            }
+        };
+
 
         document.addEventListener('keydown', e => {
             if (e.key === "Escape") closeMentorModal();
@@ -1368,6 +1595,31 @@ body.fade-out{
         }
 
 
+        function logoutUser() {
+
+            const menu = document.getElementById("settingsMenu");
+            menu.classList.remove("active"); // close dropdown
+
+            /* ⭐ DESTROY SESSION */
+            localStorage.clear();
+            sessionStorage.clear();
+
+            /* ⭐ SMOOTH FADE OUT */
+            document.body.classList.add("fade-out");
+
+            /* ⭐ REDIRECT AFTER ANIMATION */
+            setTimeout(() => {
+                window.location.href = "login.html"; // change if needed
+            }, 450);
+        }
+
+
+
+        function changePassword() {
+            alert("Open change password screen");
+            // later open modal or redirect
+        }
+
         /* Close settings if clicked outside */
         document.addEventListener("click", function (e) {
             const wrapper = document.querySelector(".settings-wrapper");
@@ -1375,6 +1627,18 @@ body.fade-out{
                 document.getElementById("settingsMenu").classList.remove("active");
             }
         });
+        function toggleLogs() {
+
+            showAllLogs = !showAllLogs;
+
+            const btn = document.getElementById("toggleLogsBtn");
+
+            btn.textContent = showAllLogs
+                ? "Show Less Logs ↑"
+                : "View All Logs →";
+
+            renderLogs();
+        }
 
     </script>
 </body>
