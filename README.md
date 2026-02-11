@@ -17,9 +17,9 @@ This project aims to create a personalized survival guide for first-semester stu
    - Adaptive quests and guidance
 
  ## Current Progress
-- Login page UI (in progress)
-- Onboarding questionnaire design and content
-- Confidence and persona definition logic (conceptual)
+- Login page UI done
+- Onboarding questionnaire UI done
+- Dashboard UI (in progress)
 
 ## Hackathon
 AMUHACKS 5.0  
