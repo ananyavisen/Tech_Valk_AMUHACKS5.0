@@ -26,6 +26,8 @@ This project aims to create a personalized survival guide for first-semester stu
 - Working on resource and quest recommendation
 - Course based resource allotment done
 - Working on quest recommendation and functionality of AI chatbot
+- Quest recommendations done
+- Currently working on functionality of AI chatbot
 
 ## Hackathon
 AMUHACKS 5.0  
