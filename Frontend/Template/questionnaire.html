@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigate Your Path - Questionnaire</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(ellipse at center, #4a3520 0%, #3d2817 60%, #1a0f08 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        /* Twinkling stars */
+    .stars {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    .star {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background: #f4e4c1;
+        border-radius: 50%;
+        box-shadow: 0 0 3px rgba(244, 228, 193, 0.8);
+        animation: twinkle 3s infinite;
+    }
+
+    @keyframes twinkle {
+        0%, 100% { opacity: 0.3; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    .star:nth-child(2n) {
+        animation-duration: 4s;
+        animation-delay: 1s;
+    }
+
+    .star:nth-child(3n) {
+        animation-duration: 5s;
+        animation-delay: 2s;
+    }
+
+    .star:nth-child(4n) {
+        width: 3px;
+        height: 3px;
+    }
+        /* Blurred background layer */
+        .background-blur {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            backdrop-filter: blur(4px);
+            background: rgba(26, 15, 8, 0.5);
+            z-index: 0;
+        }
+
+        .parallax-container {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.2s ease-out;
+            z-index: 0;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 5%;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Compass Section - Background */
+        .compass-section {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+        }
+
+        .compass-wrapper {
+            position: relative;
+            width: 600px;
+            height: 600px;
+            opacity: 0.4;
+        }
+
+        .compass {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, #2a1810 0%, #1f1209 100%);
+            box-shadow: 
+                0 0 0 3px rgba(139, 105, 20, 0.4),
+                0 0 0 8px rgba(139, 105, 20, 0.2),
+                0 0 40px rgba(218, 165, 32, 0.3),
+                inset 0 0 30px rgba(0, 0, 0, 0.6);
+        }
+
+        .compass-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+        .compass-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 1px solid rgba(218, 165, 32, 0.3);
+        }
+
+        .ring-outer {
+            width: 90%;
+            height: 90%;
+        }
+
+        .ring-middle {
+            width: 75%;
+            height: 75%;
+            border-color: rgba(218, 165, 32, 0.5);
+        }
+
+        .compass-markings {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .direction {
+            position: absolute;
+            font-size: 20px;
+            font-weight: bold;
+            color: #f4e4c1;
+            text-shadow: 0 0 10px rgba(218, 165, 32, 0.8);
+            font-family: 'Georgia', serif;
+        }
+
+        .direction.n { top: 18px; left: 50%; transform: translateX(-50%); }
+        .direction.e { right: 22px; top: 50%; transform: translateY(-50%); }
+        .direction.s { bottom: 18px; left: 50%; transform: translateX(-50%); }
+        .direction.w { left: 22px; top: 50%; transform: translateY(-50%); }
+
+        .compass-ticks {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .tick {
+            position: absolute;
+            width: 2px;
+            background: #daa520;
+            top: 12px;
+            left: 50%;
+            transform-origin: 50% 98px;
+        }
+
+        .tick.major {
+            height: 12px;
+            width: 3px;
+            background: #f4e4c1;
+            box-shadow: 0 0 5px rgba(244, 228, 193, 0.6);
+        }
+
+        .tick.minor {
+            height: 8px;
+            width: 2px;
+            background: rgba(218, 165, 32, 0.6);
+        }
+
+        .compass-needle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            transition: transform 0.3s ease-out;
+        }
+
+        .needle-north {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 70px solid #c41e3a;
+            position: absolute;
+            top: -70px;
+            left: -10px;
+            filter: drop-shadow(0 0 8px rgba(196, 30, 58, 0.9));
+        }
+
+        .needle-south {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 70px solid #f4e4c1;
+            position: absolute;
+            top: 0;
+            left: -10px;
+            filter: drop-shadow(0 0 8px rgba(244, 228, 193, 0.7));
+        }
+
+        .needle-center {
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #daa520, #c4941a, #8b6914);
+            border-radius: 50%;
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            box-shadow: 
+                0 0 15px rgba(218, 165, 32, 1),
+                inset 0 2px 5px rgba(255, 255, 255, 0.3);
+            border: 2px solid #f4e4c1;
+        }
+
+        .dashed-line {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            height: 2px;
+            background: repeating-linear-gradient(
+                to right,
+                rgba(139, 105, 20, 0.5) 0px,
+                rgba(139, 105, 20, 0.5) 8px,
+                transparent 8px,
+                transparent 16px
+            );
+            transform-origin: 0 50%;
+            z-index: 1;
+        }
+
+        .career-node {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            z-index: 5;
+        }
+
+        .node-dot {
+            width: 26px;
+            height: 26px;
+            background: radial-gradient(circle at 30% 30%, #f4e4c1, #daa520, #8b6914);
+            border-radius: 50%;
+            border: 2px solid #daa520;
+            box-shadow: 
+                0 0 20px rgba(218, 165, 32, 0.8),
+                inset 0 1px 3px rgba(255, 255, 255, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                box-shadow: 
+                    0 0 20px rgba(218, 165, 32, 0.8),
+                    inset 0 1px 3px rgba(255, 255, 255, 0.4);
+            }
+            50% { 
+                box-shadow: 
+                    0 0 30px rgba(218, 165, 32, 1),
+                    inset 0 1px 3px rgba(255, 255, 255, 0.4);
+            }
+        }
+
+        .node-label {
+            background: linear-gradient(145deg, rgba(40, 28, 16, 0.95), rgba(25, 18, 10, 0.95));
+            color: #f4e4c1;
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(139, 105, 20, 0.6);
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            box-shadow: 
+                0 0 15px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(218, 165, 32, 0.2);
+        }
+
+        /* Questionnaire Container */
+        .questionnaire-container {
+            background: linear-gradient(145deg, rgba(42, 24, 16, 0.95), rgba(26, 15, 8, 0.95));
+            border: 2px solid rgba(139, 105, 20, 0.6);
+            border-radius: 20px;
+            padding: 50px 60px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 
+                0 0 60px rgba(0, 0, 0, 0.8),
+                inset 0 0 40px rgba(0, 0, 0, 0.3),
+                0 0 80px rgba(218, 165, 32, 0.15);
+            backdrop-filter: blur(10px);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Custom scrollbar */
+        .questionnaire-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .questionnaire-container::-webkit-scrollbar-track {
+            background: rgba(15, 10, 5, 0.4);
+            border-radius: 10px;
+        }
+
+        .questionnaire-container::-webkit-scrollbar-thumb {
+            background: rgba(139, 105, 20, 0.6);
+            border-radius: 10px;
+        }
+
+        .questionnaire-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(218, 165, 32, 0.8);
+        }
+
+        .questionnaire-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(139, 105, 20, 0.3);
+        }
+
+        .questionnaire-header h1 {
+            color: #f4e4c1;
+            font-size: 36px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(218, 165, 32, 0.4);
+        }
+
+        .questionnaire-header p {
+            color: #a89968;
+            font-size: 16px;
+        }
+
+       .question-block {
+        margin-bottom: 35px;
+        display: none;
+    }
+
+    .question-block.active {
+        display: block;
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .navigation-buttons {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .nav-btn {
+        flex: 1;
+        background: rgba(139, 105, 20, 0.3);
+        color: #f4e4c1;
+        border: 1px solid rgba(139, 105, 20, 0.6);
+        padding: 14px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+        background: rgba(139, 105, 20, 0.5);
+        border-color: #daa520;
+    }
+
+    .nav-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    .nav-btn.next-btn {
+        background: linear-gradient(135deg, #d4941a, #8b6914);
+        color: #1a0f08;
+        border: none;
+    }
+
+    .nav-btn.next-btn:hover:not(:disabled) {
+        background: linear-gradient(135deg, #e6a820, #9d7515);
+        box-shadow: 0 5px 20px rgba(218, 165, 32, 0.4);
+    }
+
+    .progress-indicator {
+        text-align: center;
+        color: #a89968;
+        font-size: 14px;
+        margin-top: 20px;
+    }
+         
+        .question-label {
+            color: #f4e4c1;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            display: block;
+            line-height: 1.5;
+        }
+
+        .question-number {
+            color: #daa520;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        /* Radio button options */
+        .options-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 18px;
+            background: rgba(15, 10, 5, 0.5);
+            border: 1px solid rgba(139, 105, 20, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option-item:hover {
+            background: rgba(139, 105, 20, 0.15);
+            border-color: rgba(218, 165, 32, 0.5);
+        }
+
+        .option-item input[type="radio"] {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #8b6914;
+            border-radius: 50%;
+            margin-right: 12px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .option-item input[type="radio"]:checked {
+            border-color: #daa520;
+        }
+
+        .option-item input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: radial-gradient(circle, #daa520, #8b6914);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(218, 165, 32, 0.8);
+        }
+
+        .option-label {
+            color: #d4c4a8;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        /* Slider (Likert Scale) */
+        .slider-container {
+            padding: 20px 10px;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .slider-label {
+            color: #a89968;
+            font-size: 14px;
+            font-style: italic;
+        }
+
+        .slider-wrapper {
+            position: relative;
+            width: 100%;
+            height: 40px;
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(to right, 
+                rgba(139, 105, 20, 0.3) 0%, 
+                rgba(218, 165, 32, 0.5) 50%, 
+                rgba(218, 165, 32, 0.8) 100%);
+            border-radius: 5px;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-track {
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(to right, 
+                rgba(139, 105, 20, 0.3) 0%, 
+                rgba(218, 165, 32, 0.5) 50%, 
+                rgba(218, 165, 32, 0.8) 100%);
+            border-radius: 5px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: radial-gradient(circle, #daa520, #8b6914);
+            border: 2px solid #f4e4c1;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(218, 165, 32, 0.8);
+}
+        input[type="range"]::-moz-range-track {
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(to right, 
+                rgba(139, 105, 20, 0.3) 0%, 
+                rgba(218, 165, 32, 0.5) 50%, 
+                rgba(218, 165, 32, 0.8) 100%);
+            border-radius: 5px;
+        }
+
+        .slider-value {
+            text-align: center;
+            color: #daa520;
+            font-size: 14px;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        /* Dropdown */
+        select {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(15, 10, 5, 0.6);
+            border: 1px solid rgba(139, 105, 20, 0.5);
+            border-radius: 10px;
+            color: #f4e4c1;
+            font-size: 15px;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        select:focus {
+            border-color: #daa520;
+            box-shadow: 0 0 15px rgba(218, 165, 32, 0.3);
+        }
+
+        select option {
+            background: #2a1810;
+            color: #f4e4c1;
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #d4941a, #8b6914);
+            color: #1a0f08;
+            border: none;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(218, 165, 32, 0.3);
+            margin-top: 20px;
+            display: none;
+        }
+
+        .submit-btn.active {
+            display: block;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #e6a820, #9d7515);
+            box-shadow: 0 8px 30px rgba(218, 165, 32, 0.5);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Twinkling stars -->
+    <div class="stars" id="stars"></div>
+    <!-- Background compass with parallax -->
+    <div class="parallax-container" id="parallaxContainer">
+        <div class="compass-section">
+            <div class="compass-wrapper" id="compassWrapper">
+                <!-- Compass -->
+                <div class="compass">
+                    <div class="compass-ring ring-outer"></div>
+                    <div class="compass-ring ring-middle"></div>
+                    <div class="compass-face">
+                        <div class="compass-markings">
+                            <div class="direction n">N</div>
+                            <div class="direction e">E</div>
+                            <div class="direction s">S</div>
+                            <div class="direction w">W</div>
+                        </div>
+                        <div class="compass-ticks" id="compassTicks"></div>
+                        <div class="compass-needle" id="compassNeedle">
+                            <div class="needle-north"></div>
+                            <div class="needle-south"></div>
+                            <div class="needle-center"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Career Nodes -->
+                <div class="career-node node-engineer" style="top: -40px; left: 50%; transform: translateX(-50%);">
+                    <div class="node-dot"></div>
+                    <div class="node-label">Engineer</div>
+                </div>
+
+                <div class="career-node node-professor" style="top: 20px; left: 60px;">
+                    <div class="node-dot"></div>
+                    <div class="node-label">Professor</div>
+                </div>
+
+                <div class="career-node node-researcher" style="top: 20px; right: 60px;">
+                    <div class="node-dot"></div>
+                    <div class="node-label">Researcher</div>
+                </div>
+
+                <div class="career-node node-innovator" style="top: 50%; left: -50px; transform: translateY(-50%);">
+                    <div class="node-dot"></div>
+                    <div class="node-label">Innovator</div>
+                </div>
+
+                <div class="career-node node-architect" style="top: 50%; right: -50px; transform: translateY(-50%);">
+                    <div class="node-dot"></div>
+                    <div class="node-label">Architect</div>
+                </div>
+
+                <div class="career-node node-analyst" style="bottom: 100px; left: 50px;">
+                    <div class="node-dot"></div>
+                    <div class="node-label">Analyst</div>
+                </div>
+
+                <div class="career-node node-designer" style="bottom: 100px; right: 50px;">
+                    <div class="node-dot"></div>
+                    <div class="node-label">Designer</div>
+                </div>
+
+                <div class="career-node node-developer" style="bottom: 10px; left: 30%;">
+                    <div class="node-dot"></div>
+                    <div class="node-label">Developer</div>
+                </div>
+
+                <div class="career-node node-scientist" style="bottom: 10px; right: 28%;">
+                    <div class="node-dot"></div>
+                    <div class="node-label">Scientist</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blur overlay -->
+    <div class="background-blur"></div>
+
+    <!-- Questionnaire -->
+    <div class="container">
+        <div class="questionnaire-container">
+            <div class="questionnaire-header">
+                <h1>Navigate Your Path</h1>
+                <p>Help us understand you better to guide your journey</p>
+            </div>
+
+            <form id="questionnaireForm">
+                <!-- Question 1 -->
+                <div class="question-block">
+                    <label class="question-label">
+                        <span class="question-number">1.</span>
+                        What was the language medium of your previous school?
+                    </label>
+                    <div class="options-group">
+                        <label class="option-item">
+                            <input type="radio" name="q1" value="english">
+                            <span class="option-label">English</span>
+                        </label>
+                        <label class="option-item">
+                            <input type="radio" name="q1" value="hindi">
+                            <span class="option-label">Hindi</span>
+                        </label>
+                        <label class="option-item">
+                            <input type="radio" name="q1" value="regional">
+                            <span class="option-label">Regional Language</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="question-block">
+                    <label class="question-label">
+                        <span class="question-number">2.</span>
+                        Were you active in performing or speaking on stage during your schooling?
+                    </label>
+                    <div class="options-group">
+                        <label class="option-item">
+                            <input type="radio" name="q2" value="very_much">
+                            <span class="option-label">Very much</span>
+                        </label>
+                        <label class="option-item">
+                            <input type="radio" name="q2" value="rarely">
+                            <span class="option-label">Rarely</span>
+                        </label>
+                        <label class="option-item">
+                            <input type="radio" name="q2" value="never">
+                            <span class="option-label">Never</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="question-block">
+                    <label class="question-label">
+                        <span class="question-number">3.</span>
+                        How comfortable were you with the teaching pace in school?
+                    </label>
+                    <div class="options-group">
+                        <label class="option-item">
+                            <input type="radio" name="q3" value="too_fast">
+                            <span class="option-label">Too fast</span>
+                        </label>
+                        <label class="option-item">
+                            <input type="radio" name="q3" value="manageable">
+                            <span class="option-label">Manageable</span>
+                        </label>
+                        <label class="option-item">
+                            <input type="radio" name="q3" value="slow">
+                            <span class="option-label">Slow</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 4 -->
+                <div class="question-block">
+                    <label class="question-label">
+                        <span class="question-number">4.</span>
+                        How often did you ask questions or clear doubts in class?
+                    </label>
+                    <div class="options-group">
+                        <label class="option-item">
+                            <input type="radio" name="q4" value="frequently">
+                            <span class="option-label">Frequently</span>
+                        </label>
+                        <label class="option-item">
+                            <input type="radio" name="q4" value="sometimes">
+                            <span class="option-label">Sometimes</span>
+                        </label>
+                        <label class="option-item">
+                            <input type="radio" name="q4" value="almost_never">
+                            <span class="option-label">Almost never</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 5 - Likert Scale -->
+                <div class="question-block">
+                    <label class="question-label">
+                        <span class="question-number">5.</span>
+                        How comfortable would you be giving an extempore on a topic you know?
+                    </label>
+                    <div class="slider-container">
+                        <div class="slider-labels">
+                            <span class="slider-label">Very Uncomfortable</span>
+                            <span class="slider-label">Very Comfortable</span>
+                        </div>
+                        <div class="slider-wrapper">
+                            <input type="range" name="q5" min="1" max="5" value="3" class="slider" id="slider5">
+                        </div>
+                        <div class="slider-value" id="value5">3</div>
+                    </div>
+                </div>
+
+                <!-- Question 6 - Likert Scale -->
+                <div class="question-block">
+                    <label class="question-label">
+                        <span class="question-number">6.</span>
+                        How confident do you feel speaking in front of unfamiliar people?
+                    </label>
+                    <div class="slider-container">
+                        <div class="slider-labels">
+                            <span class="slider-label">Very Uncomfortable</span>
+                            <span class="slider-label">Very Comfortable</span>
+                        </div>
+                        <div class="slider-wrapper">
+                            <input type="range" name="q6" min="1" max="5" value="3" class="slider" id="slider6">
+                        </div>
+                        <div class="slider-value" id="value6">3</div>
+                    </div>
+                </div>
+
+                <!-- Question 7 - Likert Scale -->
+                <div class="question-block">
+                    <label class="question-label">
+                        <span class="question-number">7.</span>
+                        If you don't understand something in class, how comfortable are you seeking help?
+                    </label>
+                    <div class="slider-container">
+                        <div class="slider-labels">
+                            <span class="slider-label">Very Uncomfortable</span>
+                            <span class="slider-label">Very Comfortable</span>
+                        </div>
+                        <div class="slider-wrapper">
+                            <input type="range" name="q7" min="1" max="5" value="3" class="slider" id="slider7">
+                        </div>
+                        <div class="slider-value" id="value7">3</div>
+                    </div>
+                </div>
+
+                <!-- Question 8 - Likert Scale -->
+                <div class="question-block">
+                    <label class="question-label">
+                        <span class="question-number">8.</span>
+                        How confident do you feel expressing your opinions in group discussions?
+                    </label>
+                    <div class="slider-container">
+                        <div class="slider-labels">
+                            <span class="slider-label">Very Uncomfortable</span>
+                            <span class="slider-label">Very Comfortable</span>
+                        </div>
+                        <div class="slider-wrapper">
+                            <input type="range" name="q8" min="1" max="5" value="3" class="slider" id="slider8">
+                        </div>
+                        <div class="slider-value" id="value8">3</div>
+                    </div>
+                </div>
+
+                <!-- Question 9 - Likert Scale -->
+                <div class="question-block">
+                    <label class="question-label">
+                        <span class="question-number">9.</span>
+                        How comfortable are you adjusting to new environments?
+                    </label>
+                    <div class="slider-container">
+                        <div class="slider-labels">
+                            <span class="slider-label">Very Uncomfortable</span>
+                            <span class="slider-label">Very Comfortable</span>
+                        </div>
+                        <div class="slider-wrapper">
+                            <input type="range" name="q9" min="1" max="5" value="3" class="slider" id="slider9">
+                        </div>
+                        <div class="slider-value" id="value9">3</div>
+                    </div>
+                </div>
+
+                <!-- Question 10 -->
+                <div class="question-block">
+                    <label class="question-label">
+                        <span class="question-number">10.</span>
+                        When faced with academic pressure, how do you usually feel?
+                    </label>
+                    <div class="options-group">
+                        <label class="option-item">
+                            <input type="radio" name="q10" value="overwhelmed">
+                            <span class="option-label">Overwhelmed</span>
+                        </label>
+                        <label class="option-item">
+                            <input type="radio" name="q10" value="anxious">
+                            <span class="option-label">Slightly anxious but manageable</span>
+                        </label>
+                        <label class="option-item">
+                            <input type="radio" name="q10" value="motivated">
+                            <span class="option-label">Motivated</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 11 - Dropdown -->
+                <div class="question-block">
+                    <label class="question-label">
+                        <span class="question-number">11.</span>
+                        Which course are you currently enrolled in?
+                    </label>
+                    <select name="q11" id="course">
+                        <option value="">Select your course</option>
+                        <option value="btech">B.Tech</option>
+                        <option value="bsc">B.Sc</option>
+                    </select>
+                </div>
+
+                <!-- Question 12 - Dropdown -->
+                <div class="question-block">
+                    <label class="question-label">
+                        <span class="question-number">12.</span>
+                        Field of specialization / major
+                    </label>
+                    <select name="q12" id="specialization">
+                        <option value="">Select your specialization</option>
+                        <option value="computer_science">Computer Science</option>
+                        <option value="mechanical">Mechanical Engineering</option>
+                        <option value="electrical">Electrical Engineering</option>
+                        <option value="civil">Civil Engineering</option>
+                        <option value="physics">Physics</option>
+                        <option value="chemistry">Chemistry</option>
+                        <option value="mathematics">Mathematics</option>
+                        <option value="biology">Biology</option>
+                    </select>
+                </div>
+                 <!-- Navigation Buttons -->
+                <div class="navigation-buttons">
+                    <button type="button" class="nav-btn prev-btn" id="prevBtn" disabled>← Previous</button>
+                    <button type="button" class="nav-btn next-btn" id="nextBtn">Next →</button>
+                </div>
+
+                <div class="progress-indicator" id="progressIndicator">Question 1 of 12</div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">Submit & Continue Journey →</button>
+            </form>
+        </div>
+    </div>
+
+   <script>
+        // Create twinkling stars
+        const starsContainer = document.getElementById('stars');
+        const starCount = 65;
+        
+        for (let i = 0; i < starCount; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            starsContainer.appendChild(star);
+        }
+
+        // Create compass ticks
+        const ticksContainer = document.getElementById('compassTicks');
+        for (let i = 0; i < 36; i++) {
+            const tick = document.createElement('div');
+            if (i % 9 === 0) {
+                tick.className = 'tick major';
+            } else {
+                tick.className = 'tick minor';
+            }
+            tick.style.transform = `translateX(-50%) rotate(${i * 10}deg)`;
+            ticksContainer.appendChild(tick);
+        }
+
+        // Create dashed lines
+        function createDashedLines() {
+            const wrapper = document.getElementById('compassWrapper');
+            const compassCenter = { x: 300, y: 300 };
+            
+            const nodes = [
+                { selector: '.node-engineer', className: 'line-engineer' },
+                { selector: '.node-professor', className: 'line-professor' },
+                { selector: '.node-researcher', className: 'line-researcher' },
+                { selector: '.node-innovator', className: 'line-innovator' },
+                { selector: '.node-architect', className: 'line-architect' },
+                { selector: '.node-analyst', className: 'line-analyst' },
+                { selector: '.node-designer', className: 'line-designer' },
+                { selector: '.node-developer', className: 'line-developer' },
+                { selector: '.node-scientist', className: 'line-scientist' }
+            ];
+            
+            nodes.forEach((nodeConfig) => {
+                const node = wrapper.querySelector(nodeConfig.selector);
+                if (!node) return;
+                
+                const rect = node.getBoundingClientRect();
+                const wrapperRect = wrapper.getBoundingClientRect();
+                
+                const nodeX = rect.left - wrapperRect.left + rect.width / 2;
+                const nodeY = rect.top - wrapperRect.top + rect.height / 2;
+                
+                const dx = nodeX - compassCenter.x;
+                const dy = nodeY - compassCenter.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                const angleRad = Math.atan2(dy, dx);
+                const angleDeg = angleRad * (180 / Math.PI);
+                
+                const line = document.createElement('div');
+                line.className = 'dashed-line ' + nodeConfig.className;
+                line.style.width = `${distance - 110}px`;
+                line.style.transform = `translate(0, -50%) rotate(${angleDeg}deg)`;
+                line.style.left = `${compassCenter.x + Math.cos(angleRad) * 110}px`;
+                line.style.top = `${compassCenter.y + Math.sin(angleRad) * 110}px`;
+                
+                wrapper.insertBefore(line, wrapper.firstChild);
+            });
+        }
+
+        window.addEventListener('load', createDashedLines);
+
+        // Parallax and compass needle
+        const parallaxContainer = document.getElementById('parallaxContainer');
+        const compassNeedle = document.getElementById('compassNeedle');
+        
+        document.addEventListener('mousemove', (e) => {
+            const mouseX = e.clientX / window.innerWidth;
+            const mouseY = e.clientY / window.innerHeight;
+            
+            const moveX = (mouseX - 0.5) * 30;
+            const moveY = (mouseY - 0.5) * 30;
+            parallaxContainer.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const dx = e.clientX - centerX;
+            const dy = e.clientY - centerY;
+            const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+            
+            compassNeedle.style.transform = `translate(-50%, -50%) rotate(${angle + 90}deg)`;
+        });
+
+        // Slider value display
+        for (let i = 5; i <= 9; i++) {
+            const slider = document.getElementById(`slider${i}`);
+            const valueDisplay = document.getElementById(`value${i}`);
+            
+            slider.addEventListener('input', function() {
+                valueDisplay.textContent = this.value;
+            });
+        }
+
+        // Question navigation
+        const questions = document.querySelectorAll('.question-block');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const progressIndicator = document.getElementById('progressIndicator');
+        let currentQuestion = 0;
+
+        function showQuestion(index) {
+            questions.forEach((q, i) => {
+                q.classList.remove('active');
+                if (i === index) {
+                    q.classList.add('active');
+                }
+            });
+
+            // Update buttons
+            prevBtn.disabled = index === 0;
+            
+            if (index === questions.length - 1) {
+                nextBtn.style.display = 'none';
+                submitBtn.classList.add('active');
+            } else {
+                nextBtn.style.display = 'block';
+                submitBtn.classList.remove('active');
+            }
+
+            // Update progress
+            progressIndicator.textContent = `Question ${index + 1} of ${questions.length}`;
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion(currentQuestion);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion(currentQuestion);
+            }
+        });
+
+        // Initialize
+        showQuestion(0);
+
+        // Form submission
+        document.getElementById('questionnaireForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const responses = {};
+            
+            for (let [key, value] of formData.entries()) {
+                responses[key] = value;
+            }
+            
+            console.log('Questionnaire Responses:', responses);
+            alert('Thank you for completing the questionnaire! Your responses have been recorded.');
+        });
+    </script>
+</body>
+</html>
