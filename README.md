@@ -19,7 +19,11 @@ This project aims to create a personalized survival guide for first-semester stu
  ## Current Progress
 - Login page UI done
 - Onboarding questionnaire UI done
-- Dashboard UI (in progress)
+- Dashboard UI (almost done)
+- User authentication done
+- New account creation done
+- Saving questionnaires data in DB done
+- working on resource and quest recommendation
 
 ## Hackathon
 AMUHACKS 5.0  
