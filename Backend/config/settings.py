@@ -11,10 +11,6 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 import os
 from pathlib import Path
-from dotenv import load_dotenv
-import dj_database_url
-
-load_dotenv()
 
 HF_API_TOKEN = os.getenv("HF_API_TOKEN")
 
@@ -26,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-ysyg06y7(&55fr!div3(su%r0jigd0f8tg4fr%0_p+&8(e=er)"
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
