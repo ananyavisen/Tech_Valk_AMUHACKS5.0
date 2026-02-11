@@ -392,6 +392,66 @@
             border-color: #daa520;
         }
 
+        /* Login page: make 'Create New Account' box wider and centered */
+        .login-panel > form > .create-account-btn,
+        .login-panel > form a.create-account-btn,
+        .login-panel .back-wrapper a.create-account-btn {
+            width: 240px;
+            padding: 12px 22px;
+            height: 46px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        /* Registration-specific adjustments */
+        .container.slim-container {
+            min-height: 78vh;
+        }
+
+        .back-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: 8px;
+            margin-bottom: 6px;
+        }
+
+        .create-account-btn.back-to-login {
+            width: 220px;
+            padding: 10px 18px;
+            height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        /* Reduce panel vertical padding and input spacing so footer fits */
+        .login-panel {
+            padding: 36px 30px;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .footer-quote {
+            text-align: center;
+            margin-top: 12px;
+            color: #6b5d42;
+            font-size: 12px;
+            font-style: italic;
+        }
+
         .footer-quote {
             text-align: center;
             margin-top: 25px;
